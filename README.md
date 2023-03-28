@@ -1,4 +1,4 @@
-# SCAMIKO #
+# SSCAMIKO #
 
 Program for scanning and brute forcing through port 22 (SSH). Possibilities:
 

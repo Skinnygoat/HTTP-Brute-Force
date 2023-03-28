@@ -214,7 +214,7 @@ def execute_command(command):
     print("[+] Successfully executed command:"
           f"\n{stdout.read().decode('utf-8')}")
     # Return to Main Menu.
-    print("\n[+] Returning to main menu...\n")
+    print("[+] Returning to main menu...")
     # Return values.
     return True
 
@@ -237,7 +237,7 @@ def download_file(host_file_path, target_file_path):
     host_file_name.close()
     sftp.close()
     # Print results.
-    print("\n[+] Returning to main menu...\n")
+    print("\n[+] Returning to main menu...")
     # Return values.
     return True
 
@@ -260,7 +260,7 @@ def upload_file(host_file_path, target_file_path):
     host_file_name.close()
     sftp.close()
     # Print results.
-    print("\n[+] Returning to main menu...\n")
+    print("\n[+] Returning to main menu...")
     # Return values.
     return True
 

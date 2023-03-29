@@ -269,10 +269,10 @@ def upload_file(host_file_path, target_file_path):
 if __name__ == "__main__":
     # Print welcome message and additional information.
     print("\n=================================================="
-          "\nFINAL PROJECT"
+          "\nSScamiko"
           "\n=================================================="
           "\nInformation:"
-          "\n=> For the sake of the project choose port range from 1-1023!"
+          "\n=> The preferred range is 1 to 1023."
           "\n==================================================")
     # Inputs.
     target_ip = input("\nEnter Target IP address: ")
@@ -370,7 +370,7 @@ if __name__ == "__main__":
                                 # Information about inputs.
                                 print("\n=================================================="
                                       "\nImportant information!"
-                                      "\n=> if you are working on Windows remember about two backslashes,"
+                                      "\n=> If you are working on Windows remember about two backslashes."
                                       "\n==================================================")
                                 # Inputs.
                                 usernames_file_list = input("\nEnter path to file with usernames: ")

@@ -1,5 +1,7 @@
 # SSCAMIKO - SSH Security Scanner
 
+![SSCAMIKO](https://github.com/user-attachments/assets/91d3ded0-c82b-4fbe-becd-48f2f4819310)
+
 ## Overview
 SSCAMIKO is a professional and user-friendly tool designed for cybersecurity specialists to analyze and secure SSH services. This tool provides advanced capabilities such as:
 
